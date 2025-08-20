@@ -27,6 +27,7 @@ type T_STATE is
 signal state : T_STATE := FETCH; 
 -- Reset state?
 begin
+
     process(clk) begin
         case state is
 

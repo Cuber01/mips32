@@ -44,6 +44,12 @@ component Datapath is
            MemtoReg : in STD_LOGIC);
 end component;
 
+component ALUDecoder is
+    Port ( ALUOp : in STD_LOGIC_VECTOR (1 downto 0);
+           Funct : in STD_LOGIC_VECTOR (5 downto 0);
+           Control : out STD_LOGIC_VECTOR (2 downto 0));
+end component;
+
 signal Op: STD_LOGIC_VECTOR(31 downto 26) := (others => '0');
 signal Funct: STD_LOGIC_VECTOR(31 downto 26) := (others => '0');
 
@@ -52,14 +58,15 @@ signal ALUControl : STD_LOGIC_VECTOR(2 downto 0) := (others => '0');
 signal ALUOp, SrcBChoose : STD_LOGIC_VECTOR (1 downto 0) := (others => '0');
 
 begin
-    MIPSDatapath: Datapath port map(clk=>clk, reset=>reset, Op=>Op, Funct=>Funct, IorD=>IorD, ShouldMemWrite=>ShouldMemWrite,
-                                    IRWrite=>IRWrite, PCWrite=>PCWrite, oBranch=>oBranch, PCSrc=>PCSrc, SrcAChoose=>SrcAChoose,
-                                    RegWrite=>RegWrite, RegDst=>RegDst, MemtoReg=>MemtoReg, ALUControl=>ALUControl,
-                                    ALUOp=>ALUOp, SrcBChoose=>SrcBChoose);
-                                    
     MIPSControlUnit: ControlUnit port map(clk=>clk, reset=>reset, Op=>Op, Funct=>Funct, IorD=>IorD, ShouldMemWrite=>ShouldMemWrite,
                                          IRWrite=>IRWrite, PCWrite=>PCWrite, oBranch=>oBranch, PCSrc=>PCSrc, SrcAChoose=>SrcAChoose,
                                          RegWrite=>RegWrite, RegDst=>RegDst, MemtoReg=>MemtoReg, ALUControl=>ALUControl,
                                          ALUOp=>ALUOp, SrcBChoose=>SrcBChoose);
+    
+    MIPSALUDecoder: ALUDecoder port map(ALUOp=>ALUOp, Funct=>Funct, Control=>ALUControl);                      
 
+    MIPSDatapath: Datapath port map(clk=>clk, reset=>reset, Op=>Op, Funct=>Funct, IorD=>IorD, ShouldMemWrite=>ShouldMemWrite,
+                                    IRWrite=>IRWrite, PCWrite=>PCWrite, oBranch=>oBranch, PCSrc=>PCSrc, SrcAChoose=>SrcAChoose,
+                                    RegWrite=>RegWrite, RegDst=>RegDst, MemtoReg=>MemtoReg, ALUControl=>ALUControl,
+                                    ALUOp=>ALUOp, SrcBChoose=>SrcBChoose);
 end Behavioral;

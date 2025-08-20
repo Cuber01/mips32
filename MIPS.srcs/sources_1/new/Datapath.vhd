@@ -1,14 +1,6 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
 
 entity Datapath is
     Port ( clk, reset : in STD_LOGIC;
@@ -113,13 +105,13 @@ begin
                                                   WriteData => RegReadData2, ReadData => MemReadData);
     
     InstrFlipFlop: EnabledFlipFlop port map(clk => clk, enabled => IRWrite, input => MemReadData, output => Instr);
-    -- input to control unit???
     WriteAdrMux: Mux2 port map(Choose => RegDst, IfTrue => Instr(15 downto 11), IfFalse => Instr(20 downto 16), y => RegWriteAdr);
     WriteDataMux: Mux2 port map(Choose => MemtoReg, IfTrue => MemReadData, IfFalse => ALUOut, y => RegWriteData);
     Registers: RegisterFile port map(clk => clk, ReadAdr1=>Instr(25 downto 21), ReadAdr2=>Instr(20 downto 16), WriteAdr => RegWriteAdr,
                                      RegWrite=>RegWrite, ReadData1=>RegReadData1, ReadData2=>RegReadData2, WriteData => RegWriteData);
     
     SignExtender: SignExtend port map(a => Instr(15 downto 0), y=> SignImmediate);
+    Shifter: ShiftLeft2 port map (a => SignImmediate, y => ImmediateShifted);
     SrcBDecoder: Decoder4 port map(a => RegReadData2, b => "100", c => SignImmediate, d => ImmediateShifted,
                                       Choose => SrcBChoose, y => SrcB);
     SrcAMux: Mux2 port map(Choose => SrcAChoose, IfFalse => PC, IfTrue => RegReadData1, y => SrcA);

@@ -3,11 +3,11 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 entity ControlUnit is
-    Port ( clk : in STD_LOGIC;
+    Port ( clk, reset : in STD_LOGIC;
            Op : in STD_LOGIC_VECTOR (31 downto 26);
            Funct : in STD_LOGIC_VECTOR (5 downto 0);
            IorD : out STD_LOGIC;
-           MemWrite : out STD_LOGIC;
+           ShouldMemWrite : out STD_LOGIC;
            IRWrite : out STD_LOGIC;
            PCWrite : out STD_LOGIC;
            oBranch : out STD_LOGIC;
@@ -78,7 +78,7 @@ begin
             -- Mem Write
             when MEM_WRITE =>
                 IorD <= '1';
-                MemWrite <= '1';
+                ShouldMemWrite <= '1';
                 
                 state <= FETCH;
             -- Execute

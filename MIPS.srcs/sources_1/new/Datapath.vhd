@@ -75,12 +75,17 @@ architecture Behavioral of Datapath is
     -- Memory - Instrution and Data
     signal MemAddr: STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
     signal MemReadData: STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
-    
+    -- on risng edge =>
     signal Instr: STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
+    signal Data: STD_LOGIC_VECTOR(31 downto 0) := (others => '0'); -- Potential data for RegWriteData
     
     -- Register File
+    signal RegOut1: STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
+    signal RegOut2: STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
+        -- =>
     signal RegReadData1: STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
     signal RegReadData2: STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
+    
     signal RegWriteAdr: STD_LOGIC_VECTOR(4 downto 0) := (others => '0');
     signal RegWriteData: STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
     
@@ -90,6 +95,7 @@ architecture Behavioral of Datapath is
     
     -- ALU
     signal ALUOut: STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
+    signal ALUResult: STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
     signal SrcA: STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
     signal SrcB: STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
     signal ALUZero: STD_LOGIC := '0';
@@ -106,15 +112,24 @@ begin
     
     InstrFlipFlop: EnabledFlipFlop port map(clk => clk, enabled => IRWrite, input => MemReadData, output => Instr);
     WriteAdrMux: Mux2 port map(Choose => RegDst, IfTrue => Instr(15 downto 11), IfFalse => Instr(20 downto 16), y => RegWriteAdr);
-    WriteDataMux: Mux2 port map(Choose => MemtoReg, IfTrue => MemReadData, IfFalse => ALUOut, y => RegWriteData);
+    WriteDataMux: Mux2 port map(Choose => MemtoReg, IfTrue => Data, IfFalse => ALUOut, y => RegWriteData);
     Registers: RegisterFile port map(clk => clk, ReadAdr1=>Instr(25 downto 21), ReadAdr2=>Instr(20 downto 16), WriteAdr => RegWriteAdr,
-                                     RegWrite=>RegWrite, ReadData1=>RegReadData1, ReadData2=>RegReadData2, WriteData => RegWriteData);
+                                     RegWrite=>RegWrite, ReadData1=>RegOut1, ReadData2=>RegOut2, WriteData => RegWriteData);
     
     SignExtender: SignExtend port map(a => Instr(15 downto 0), y=> SignImmediate);
     Shifter: ShiftLeft2 port map (a => SignImmediate, y => ImmediateShifted);
     SrcBDecoder: Decoder4 port map(a => RegReadData2, b => "100", c => SignImmediate, d => ImmediateShifted,
                                       Choose => SrcBChoose, y => SrcB);
     SrcAMux: Mux2 port map(Choose => SrcAChoose, IfFalse => PC, IfTrue => RegReadData1, y => SrcA);
-    MainALU: ALU port map(SrcA => SrcA, SrcB => SrcB, Control => ALUControl, Zero => ALUZero, ALUResult => ALUOut);
+    MainALU: ALU port map(SrcA => SrcA, SrcB => SrcB, Control => ALUControl, Zero => ALUZero, ALUResult => ALUResult);
+    
+    process(clk) begin
+        if rising_edge(clk) then
+            ALUOut <= ALUResult;
+            Data <= MemReadData;
+            RegReadData1 <= RegOut1;
+            RegReadData2 <= RegOut2;
+        end if;
+    end process;
     
 end Behavioral;

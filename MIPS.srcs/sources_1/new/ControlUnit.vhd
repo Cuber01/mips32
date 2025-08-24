@@ -25,9 +25,8 @@ architecture Behavioral of ControlUnit is
 type T_STATE is
       (FETCH, DECODE, MEM_ADR, MEM_READ, MEM_WRITEBACK, MEM_WRITE, EXECUTE, ALU_WRITEBACK, BRANCH);
 signal state : T_STATE := FETCH; 
--- Reset state?
-begin
 
+begin
     process(clk) begin
         case state is
 
@@ -59,7 +58,7 @@ begin
                 
                 if Op="100011" then
                     -- lw
-                    state <= MEM_READ; -- Mem Read
+                    state <= MEM_READ; 
                 else
                     -- sw
                     state <= MEM_WRITE;

@@ -5,7 +5,7 @@ entity MIPSCore is
   Port ( clk, reset : in STD_LOGIC);
 end MIPSCore;
 
-architecture Behavioral of MIPSCore is
+architecture Behavioral of MIPSCore is    
 component ControlUnit is
     Port ( clk, reset : in STD_LOGIC;
            Op : in STD_LOGIC_VECTOR (31 downto 26);

@@ -31,9 +31,9 @@ begin
                 AluResult <= SrcA or SrcB;
             when "111" => 
                 if signed(SrcA) < signed(SrcB) then
-                    AluResult <= x"ffff";
+                    AluResult <= x"ffffffff";
                 else 
-                    AluResult <= x"0000";
+                    AluResult <= x"00000000";
                 end if;
             when others =>
                 report "Unknown Alu Control";

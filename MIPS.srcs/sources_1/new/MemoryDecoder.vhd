@@ -3,15 +3,15 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 use STD.TEXTIO.ALL;
 
-entity MemoryDecoder is
+entity Memory is
     Port ( clk : in STD_LOGIC;
            Addr : in STD_LOGIC_VECTOR (31 downto 0);
            ShouldMemWrite : in STD_LOGIC;
            WriteData : in STD_LOGIC_VECTOR (31 downto 0);
            ReadData : out STD_LOGIC_VECTOR (31 downto 0));
-end MemoryDecoder;
+end Memory;
 
-architecture Behavioral of MemoryDecoder is
+architecture Behavioral of Memory is
 signal init: STD_LOGIC := '0';
 begin
     process (clk) is 
@@ -22,7 +22,7 @@ begin
     variable i, index, result: integer;
     type ramtype is array (63 downto 0) of STD_LOGIC_VECTOR(31 downto 0);
     variable mem: ramtype;  
-      
+
     begin
         -- load file
         if init='0' then
@@ -30,7 +30,7 @@ begin
                 mem(i) := (others => '0');
             end loop;
             index := 0;
-            FILE_OPEN(mem_file, "path", READ_MODE);
+            FILE_OPEN(mem_file, "/home/cubeq/Projects/FPGA/MIPS/Test.asm", READ_MODE);
             while not endfile(mem_file) loop
                 readline(mem_file, L);
                 result := 0;

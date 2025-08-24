@@ -128,6 +128,8 @@ begin
                 when "101010" => Control <= "111"; -- slt
                 when others => Control <= "---"; -- ???
             end case;
+        when others => 
+            Control <= "---";
     end case;
     end process;
 

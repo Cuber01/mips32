@@ -23,7 +23,7 @@ end ControlUnit;
 
 architecture Behavioral of ControlUnit is
 type T_STATE is
-      (FETCH, DECODE, MEM_ADR, MEM_READ, MEM_WRITEBACK, MEM_WRITE, EXECUTE, ALU_WRITEBACK, BRANCH);
+      (FETCH, DECODE, MEM_ADR, MEM_READ, MEM_WRITEBACK, MEM_WRITE, EXECUTE, ALU_WRITEBACK, BRANCH, ADDI_EXECUTE, ADDI_WRITEBACK);
 signal state : T_STATE := FETCH; 
 
 begin
@@ -47,6 +47,8 @@ begin
                         state <= EXECUTE; -- Execute R instruction
                     when "100011" | "101011" =>
                         state <= MEM_ADR; -- lw or sw
+                    when "001000" =>
+                        state <= ADDI_EXECUTE;    
                     when others =>
                         report "Unknown OP";
                 end case;
@@ -63,38 +65,53 @@ begin
                     -- sw
                     state <= MEM_WRITE;
                 end if;
-            -- Mem Read
+
             when MEM_READ =>
                 IorD <= '1';
                 
                 state <= MEM_WRITEBACK;
-            -- Mem Writeback
+
             when MEM_WRITEBACK =>
                 RegDst <= '0';
                 MemtoReg <= '1';
                 RegWrite <= '1';
                 
                 state <= FETCH;
-            -- Mem Write
+
             when MEM_WRITE =>
                 IorD <= '1';
                 ShouldMemWrite <= '1';
                 
                 state <= FETCH;
-            -- Execute
+
             when EXECUTE =>
                 SrcAChoose <= '1';
                 SrcBChoose <= "00";
                 ALUOp <= "10";
                 
                 state <= ALU_WRITEBACK;
-            -- ALU Writeback
+
             when ALU_WRITEBACK =>
                 RegDst <= '1';
                 MemtoReg <= '0';
                 RegWrite <= '1';
                 
                 state <= FETCH;
+                
+            when ADDI_EXECUTE =>
+                SrcBChoose <= "10";
+                SrcAChoose <= '1';
+                ALUOp <= "00";
+                
+                state <= ADDI_WRITEBACK;
+                
+            when ADDI_WRITEBACK =>
+                MemtoReg <= '0';
+                RegWrite <= '1';
+                RegDst <= '0';
+                
+                state <= FETCH;
+            
             when others =>
                 report "Unknown state";
         end case;

@@ -1,1 +1,1 @@
-main:	addi $2, $0, 5
+addi $s0, $0, 5

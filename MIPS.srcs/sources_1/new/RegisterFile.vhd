@@ -2,11 +2,6 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
-
 entity RegisterFile is
     Port ( clk : in STD_LOGIC;
            ReadAdr1, ReadAdr2, WriteAdr : in STD_LOGIC_VECTOR (4 downto 0);
@@ -23,7 +18,7 @@ begin
     process(clk) begin
         if rising_edge(clk) then
             if RegWrite='1' then
-                mem(to_integer(signed(WriteAdr))) <= WriteData;
+                mem(to_integer(unsigned(WriteAdr))) <= WriteData;
             end if;
         end if;
     end process;
@@ -33,13 +28,13 @@ begin
         if(signed(ReadAdr1)=0) then
             ReadData1 <= x"00000000";
         else
-            ReadData1 <= mem(to_integer(signed(ReadAdr1)));
+            ReadData1 <= mem(to_integer(unsigned(ReadAdr1)));
         end if;
         
         if(signed(ReadAdr2)=0) then
             ReadData2 <= x"00000000";
         else
-            ReadData2 <= mem(to_integer(signed(ReadAdr2)));
+            ReadData2 <= mem(to_integer(unsigned(ReadAdr2)));
         end if;
     end process;
 

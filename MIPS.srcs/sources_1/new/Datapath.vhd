@@ -122,6 +122,7 @@ begin
                                       Choose => SrcBChoose, y => SrcB);
     SrcAMux: Mux2 port map(Choose => SrcAChoose, IfFalse => PC, IfTrue => RegReadData1, y => SrcA);
     MainALU: ALU port map(SrcA => SrcA, SrcB => SrcB, Control => ALUControl, Zero => ALUZero, ALUResult => ALUResult);
+    PCMux: Mux2 port map(Choose => PCSrc, IfFalse => ALUResult, IfTrue => ALUOut, y => NextPC);
     
     process(clk) begin
         if rising_edge(clk) then

@@ -17,7 +17,7 @@ end ALU;
 
 architecture Behavioral of ALU is
 begin
-    process(Control)
+    process(Control,SrcA,SrcB)
     begin
         case Control is
             when "010" => 
@@ -46,7 +46,7 @@ begin
                     report "RESULT FALSE";
                 end if;
             when others =>
-                report "Unknown Alu Control";
+                report "Alu Control ignored";
         end case;
     end process;
 

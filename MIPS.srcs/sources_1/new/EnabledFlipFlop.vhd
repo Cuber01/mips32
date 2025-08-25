@@ -11,7 +11,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity EnabledFlipFlop is
-    Port ( clk : in STD_LOGIC;
+    Port ( clk, reset : in STD_LOGIC;
            enabled : in STD_LOGIC;
            input : in STD_LOGIC_VECTOR (31 downto 0);
            output : out STD_LOGIC_VECTOR (31 downto 0));
@@ -20,12 +20,19 @@ end EnabledFlipFlop;
 architecture Behavioral of EnabledFlipFlop is
 signal value: STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
 begin
-    process(clk) begin
-        if rising_edge(clk) and enabled='1' then
-            value <= input;
+    process(clk, reset) begin
+        if reset='1' then
+            value <= (others => '0');
         end if;
         
-        output <= value;
+        if rising_edge(clk) then
+            if enabled='1' then
+                value <= input;
+            end if;
+            
+            output <= value;
+        end if;
+        
     end process;
 
 end Behavioral;

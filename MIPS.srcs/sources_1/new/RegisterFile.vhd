@@ -23,8 +23,7 @@ begin
         end if;
     end process;
     
-    -- all
-    process(clk, ReadAdr1, ReadAdr2, WriteAdr, WriteData, RegWrite) begin
+    process(clk, ReadAdr1, ReadAdr2) begin
         if(signed(ReadAdr1)=0) then
             ReadData1 <= x"00000000";
         else

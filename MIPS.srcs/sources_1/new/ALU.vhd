@@ -17,7 +17,7 @@ end ALU;
 
 architecture Behavioral of ALU is
 begin
-    process(SrcA, SrcB)
+    process(Control, SrcA, SrcB)
     variable result: STD_LOGIC_VECTOR (31 downto 0);
     begin
         case Control is

@@ -2,6 +2,7 @@ MIPS.cache
 MIPS.hw
 MIPS.ip_user_files
 MIPS.sim
+MIPS.runs
 temp.txt
 a.out
 a.out.text.bin

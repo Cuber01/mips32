@@ -7,7 +7,7 @@ entity ControlUnit is
            Op : in STD_LOGIC_VECTOR (31 downto 26);
            Funct : in STD_LOGIC_VECTOR (5 downto 0);
            IorD : out STD_LOGIC;
-           ShouldMemWrite : out STD_LOGIC;
+           MemWrite : out STD_LOGIC;
            IRWrite : out STD_LOGIC;
            PCWrite : out STD_LOGIC;
            oBranch : out STD_LOGIC;
@@ -31,22 +31,38 @@ begin
 end procedure report_state;
 
 begin
+    -- Remember to properly reset Enables! Currently they get partially reset in FETCH and then fully in DECODE.
+    -- That is because as of now they only get asserted in FETCH and in states leading to FETCH, but if this changes, 
+    -- there will be a need for more resets
     process(clk) begin
         case state is
 
             when FETCH =>
+                -- Enables
+                MemWrite <= '0';
+                IRWrite <= '1';
+                PCWrite <= '1';
+                oBranch <= '0';
+                RegWrite <= '0';
+            
                 IorD <= '0';
                 SrcAChoose <= '0';
                 SrcBChoose <= "01";
                 ALUOp <= "00";
                 PCSrc <= '0';
-                IRWrite <= '1';
-                PCWrite <= '1';
+               
                 
                 report_state(DECODE);
                 state <= DECODE;
 
             when DECODE =>
+                -- Enables
+                MemWrite <= '0';
+                IRWrite <= '0';
+                PCWrite <= '0';
+                oBranch <= '0';
+                RegWrite <= '0';
+            
                 case Op is
                     when "000000" =>
                         report_state(EXECUTE);
@@ -92,7 +108,7 @@ begin
 
             when MEM_WRITE =>
                 IorD <= '1';
-                ShouldMemWrite <= '1';
+                MemWrite <= '1';
                 
                 report_state(FETCH);
                 state <= FETCH;

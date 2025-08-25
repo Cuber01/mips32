@@ -34,7 +34,7 @@ architecture Behavioral of Datapath is
            y : out STD_LOGIC_VECTOR (31 downto 0));
     end component;
     component  EnabledFlipFlop is
-    Port ( clk : in STD_LOGIC;
+    Port ( clk, reset : in STD_LOGIC;
            enabled : in STD_LOGIC;
            input : in STD_LOGIC_VECTOR (31 downto 0);
            output : out STD_LOGIC_VECTOR (31 downto 0));
@@ -48,7 +48,7 @@ architecture Behavioral of Datapath is
            y : out STD_LOGIC_VECTOR (31 downto 0));
     end component;
     component Memory is
-    Port ( clk : in STD_LOGIC;
+    Port ( clk, reset : in STD_LOGIC;
            Addr : in STD_LOGIC_VECTOR (31 downto 0);
            ShouldMemWrite : in STD_LOGIC;
            WriteData : in STD_LOGIC_VECTOR (31 downto 0);
@@ -111,12 +111,12 @@ begin
     Op <= Instr(31 downto 26);
     Funct <= Instr(5 downto 0);
     
-    PcFlipFlop: EnabledFlipFlop port map(clk => clk, enabled => EnablePC, input => NextPC, output => PC);
+    PcFlipFlop: EnabledFlipFlop port map(clk => clk, reset => reset, enabled => EnablePC, input => NextPC, output => PC);
     MemoryAdrMux: Mux2 port map(Choose => IorD, IfTrue => ALUOut, IfFalse => PC, y => MemAddr);
-    InstructionAndDataMem: Memory port map(clk => clk, Addr => MemAddr, ShouldMemWrite => ShouldMemWrite, 
+    InstructionAndDataMem: Memory port map(clk => clk, reset => reset, Addr => MemAddr, ShouldMemWrite => ShouldMemWrite, 
                                                   WriteData => RegReadData2, ReadData => MemReadData);
     
-    InstrFlipFlop: EnabledFlipFlop port map(clk => clk, enabled => IRWrite, input => MemReadData, output => Instr);
+    InstrFlipFlop: EnabledFlipFlop port map(clk => clk, reset => reset, enabled => IRWrite, input => MemReadData, output => Instr);
     WriteAdrMux: Mux2 generic map(width=>5) 
                  port map(Choose => RegDst, IfTrue => Instr(15 downto 11), IfFalse => Instr(20 downto 16), y => RegWriteAdr);
     WriteDataMux: Mux2 port map(Choose => MemtoReg, IfTrue => Data, IfFalse => ALUOut, y => RegWriteData);
@@ -125,7 +125,7 @@ begin
     
     SignExtender: SignExtend port map(a => Instr(15 downto 0), y=> SignImmediate);
     Shifter: ShiftLeft2 port map (a => SignImmediate, y => ImmediateShifted);
-    SrcBDecoder: Decoder4 port map(a => RegReadData2, b => x"0000000d", c => SignImmediate, d => ImmediateShifted,
+    SrcBDecoder: Decoder4 port map(a => RegReadData2, b => x"00000004", c => SignImmediate, d => ImmediateShifted,
                                       Choose => SrcBChoose, y => SrcB);
     SrcAMux: Mux2 port map(Choose => SrcAChoose, IfFalse => PC, IfTrue => RegReadData1, y => SrcA);
     MainALU: ALU port map(SrcA => SrcA, SrcB => SrcB, Control => ALUControl, Zero => ALUZero, ALUResult => ALUResult);

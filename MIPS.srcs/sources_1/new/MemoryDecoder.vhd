@@ -32,11 +32,11 @@ begin
             end if;
         end if;
         
-        ReadData <= mem(to_integer(signed(Addr)));
+        ReadData <= mem(to_integer(unsigned(Addr)));
     
         -- load file
         if init='0' then
-            for i in 0 to 63 loop
+            for i in 63 downto 0 loop
                 mem(i) <= (others => '0');
             end loop;
             index := 0;

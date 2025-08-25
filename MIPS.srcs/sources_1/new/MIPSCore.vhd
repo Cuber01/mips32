@@ -16,7 +16,6 @@ component ControlUnit is
            PCWrite : out STD_LOGIC;
            oBranch : out STD_LOGIC;
            PCSrc : out STD_LOGIC;
-           ALUControl : out STD_LOGIC_VECTOR (2 downto 0);
            ALUOp : out STD_LOGIC_VECTOR (1 downto 0);
            SrcBChoose : out STD_LOGIC_VECTOR (1 downto 0);
            SrcAChoose : out STD_LOGIC;
@@ -60,7 +59,7 @@ signal ALUOp, SrcBChoose : STD_LOGIC_VECTOR (1 downto 0) := (others => '0');
 begin
     MIPSControlUnit: ControlUnit port map(clk=>clk, reset=>reset, Op=>Op, Funct=>Funct, IorD=>IorD, ShouldMemWrite=>ShouldMemWrite,
                                          IRWrite=>IRWrite, PCWrite=>PCWrite, oBranch=>oBranch, PCSrc=>PCSrc, SrcAChoose=>SrcAChoose,
-                                         RegWrite=>RegWrite, RegDst=>RegDst, MemtoReg=>MemtoReg, ALUControl=>ALUControl,
+                                         RegWrite=>RegWrite, RegDst=>RegDst, MemtoReg=>MemtoReg,
                                          ALUOp=>ALUOp, SrcBChoose=>SrcBChoose);
     
     MIPSALUDecoder: ALUDecoder port map(ALUOp=>ALUOp, Funct=>Funct, Control=>ALUControl);                      

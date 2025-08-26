@@ -125,7 +125,7 @@ begin
     
     SignExtender: SignExtend port map(a => Instr(15 downto 0), y=> SignImmediate);
     Shifter: ShiftLeft2 port map (a => SignImmediate, y => ImmediateShifted);
-    SrcBDecoder: Decoder4 port map(a => RegReadData2, b => x"00000004", c => SignImmediate, d => ImmediateShifted,
+    SrcBDecoder: Decoder4 port map(a => RegReadData2, b => x"00000001", c => SignImmediate, d => ImmediateShifted,
                                       Choose => SrcBChoose, y => SrcB);
     SrcAMux: Mux2 port map(Choose => SrcAChoose, IfFalse => PC, IfTrue => RegReadData1, y => SrcA);
     MainALU: ALU port map(SrcA => SrcA, SrcB => SrcB, Control => ALUControl, Zero => ALUZero, ALUResult => ALUResult);

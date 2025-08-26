@@ -18,7 +18,6 @@ begin
     process(clk) begin
         if rising_edge(clk) then
             if RegWrite='1' then
-                report "REGISTER WRITE " & integer'image(to_integer(unsigned(WriteData))) & " at " & integer'image(to_integer(unsigned(WriteAdr)));
                 mem(to_integer(unsigned(WriteAdr))) <= WriteData;
             end if;
         end if;

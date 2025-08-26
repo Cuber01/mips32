@@ -22,7 +22,8 @@ end ControlUnit;
 
 architecture Behavioral of ControlUnit is
 type T_STATE is
-      (FETCH, DECODE, CHECK_OP, MEM_ADR, MEM_READ, MEM_WRITEBACK, MEM_WRITE, EXECUTE, ALU_WRITEBACK, BRANCH, ADDI_EXECUTE, ADDI_WRITEBACK);
+      (FETCH, DECODE, CHECK_OP, MEM_ADR, MEM_READ, MEM_WRITEBACK, 
+       MEM_WRITE, EXECUTE, ALU_WRITEBACK, BRANCH, ADDI_EXECUTE, ADDI_WRITEBACK);
 signal state : T_STATE := FETCH; 
     
 procedure report_state(newState : in T_STATE) is
@@ -35,6 +36,7 @@ begin
     -- That is because as of now they only get asserted in FETCH and in states leading to FETCH, but if this changes, 
     -- there will be a need for more resets
     process(clk) begin
+        -- Should it really be falling edge?
         if falling_edge(clk) then
             case state is
     
@@ -195,7 +197,7 @@ begin
                     report "Funct is or";
                 when "101010" => 
                     Control <= "111"; -- slt
-                    report "Funct is shift left.";
+                    report "Funct is set if less than.";
                 when others => 
                     report "Funct is unknown";
                     Control <= "---"; -- ???

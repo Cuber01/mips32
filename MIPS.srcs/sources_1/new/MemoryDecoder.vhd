@@ -6,7 +6,7 @@ use STD.TEXTIO.ALL;
 entity Memory is
     Port ( clk, reset : in STD_LOGIC;
            Addr : in STD_LOGIC_VECTOR (31 downto 0);
-           ShouldMemWrite : in STD_LOGIC;
+           MemWrite : in STD_LOGIC;
            WriteData : in STD_LOGIC_VECTOR (31 downto 0);
            ReadData : out STD_LOGIC_VECTOR (31 downto 0));
 end Memory;
@@ -27,7 +27,8 @@ begin
     
     begin
         if rising_edge(clk) then
-            if ShouldMemWrite='1' then
+            if MemWrite='1' then
+                report "MEMORY WRITE " & integer'image(to_integer(unsigned(WriteData))) & " at " & integer'image(to_integer(signed(Addr)));
                 mem(to_integer(signed(Addr))) <= WriteData;
             end if;
         end if;

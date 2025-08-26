@@ -11,7 +11,7 @@ component ControlUnit is
            Op : in STD_LOGIC_VECTOR (31 downto 26);
            Funct : in STD_LOGIC_VECTOR (5 downto 0);
            IorD : out STD_LOGIC;
-           ShouldMemWrite : out STD_LOGIC;
+           MemWrite : out STD_LOGIC;
            IRWrite : out STD_LOGIC;
            PCWrite : out STD_LOGIC;
            oBranch : out STD_LOGIC;
@@ -29,7 +29,7 @@ component Datapath is
            Op : out STD_LOGIC_VECTOR(31 downto 26);
            Funct: out STD_LOGIC_VECTOR(5 downto 0);
            IorD : in STD_LOGIC;
-           ShouldMemWrite : in STD_LOGIC;
+           MemWrite : in STD_LOGIC;
            IRWrite : in STD_LOGIC;
            PCWrite : in STD_LOGIC;
            oBranch : in STD_LOGIC;
@@ -52,19 +52,19 @@ end component;
 signal Op: STD_LOGIC_VECTOR(31 downto 26) := (others => '0');
 signal Funct: STD_LOGIC_VECTOR(31 downto 26) := (others => '0');
 
-signal IorD, ShouldMemWrite, IRWrite, PCWrite, oBranch, PCSrc, SrcAChoose, RegWrite, RegDst, MemtoReg : STD_LOGIC := '0';
+signal IorD, MemWrite, IRWrite, PCWrite, oBranch, PCSrc, SrcAChoose, RegWrite, RegDst, MemtoReg : STD_LOGIC := '0';
 signal ALUControl : STD_LOGIC_VECTOR(2 downto 0) := (others => '0');
 signal ALUOp, SrcBChoose : STD_LOGIC_VECTOR (1 downto 0) := (others => '0');
 
 begin
-    MIPSControlUnit: ControlUnit port map(clk=>clk, reset=>reset, Op=>Op, Funct=>Funct, IorD=>IorD, ShouldMemWrite=>ShouldMemWrite,
+    MIPSControlUnit: ControlUnit port map(clk=>clk, reset=>reset, Op=>Op, Funct=>Funct, IorD=>IorD, MemWrite=>MemWrite,
                                          IRWrite=>IRWrite, PCWrite=>PCWrite, oBranch=>oBranch, PCSrc=>PCSrc, SrcAChoose=>SrcAChoose,
                                          RegWrite=>RegWrite, RegDst=>RegDst, MemtoReg=>MemtoReg,
                                          ALUOp=>ALUOp, SrcBChoose=>SrcBChoose);
     
     MIPSALUDecoder: ALUDecoder port map(ALUOp=>ALUOp, Funct=>Funct, Control=>ALUControl);                      
 
-    MIPSDatapath: Datapath port map(clk=>clk, reset=>reset, Op=>Op, Funct=>Funct, IorD=>IorD, ShouldMemWrite=>ShouldMemWrite,
+    MIPSDatapath: Datapath port map(clk=>clk, reset=>reset, Op=>Op, Funct=>Funct, IorD=>IorD, MemWrite=>MemWrite,
                                     IRWrite=>IRWrite, PCWrite=>PCWrite, oBranch=>oBranch, PCSrc=>PCSrc, SrcAChoose=>SrcAChoose,
                                     RegWrite=>RegWrite, RegDst=>RegDst, MemtoReg=>MemtoReg, ALUControl=>ALUControl,
                                     ALUOp=>ALUOp, SrcBChoose=>SrcBChoose);

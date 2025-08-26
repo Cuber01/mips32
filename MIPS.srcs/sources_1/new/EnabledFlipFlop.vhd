@@ -21,9 +21,9 @@ begin
             if enabled='1' then
                 value <= input;
             end if;
-            
-            output <= value;
         end if;
+        
+        output <= value;
         
     end process;
 

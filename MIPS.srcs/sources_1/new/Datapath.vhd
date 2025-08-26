@@ -5,7 +5,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity Datapath is
     Port ( clk, reset : in STD_LOGIC;
            IorD : in STD_LOGIC;
-           ShouldMemWrite : in STD_LOGIC;
+           MemWrite : in STD_LOGIC;
            IRWrite : in STD_LOGIC;
            PCWrite : in STD_LOGIC;
            oBranch : in STD_LOGIC;
@@ -50,7 +50,7 @@ architecture Behavioral of Datapath is
     component Memory is
     Port ( clk, reset : in STD_LOGIC;
            Addr : in STD_LOGIC_VECTOR (31 downto 0);
-           ShouldMemWrite : in STD_LOGIC;
+           MemWrite : in STD_LOGIC;
            WriteData : in STD_LOGIC_VECTOR (31 downto 0);
            ReadData : out STD_LOGIC_VECTOR (31 downto 0));
     end component;
@@ -113,7 +113,7 @@ begin
     
     PcFlipFlop: EnabledFlipFlop port map(clk => clk, reset => reset, enabled => EnablePC, input => NextPC, output => PC);
     MemoryAdrMux: Mux2 port map(Choose => IorD, IfTrue => ALUOut, IfFalse => PC, y => MemAddr);
-    InstructionAndDataMem: Memory port map(clk => clk, reset => reset, Addr => MemAddr, ShouldMemWrite => ShouldMemWrite, 
+    InstructionAndDataMem: Memory port map(clk => clk, reset => reset, Addr => MemAddr, MemWrite => MemWrite, 
                                                   WriteData => RegReadData2, ReadData => MemReadData);
     
     InstrFlipFlop: EnabledFlipFlop port map(clk => clk, reset => reset, enabled => IRWrite, input => MemReadData, output => Instr);

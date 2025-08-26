@@ -22,7 +22,7 @@ end ControlUnit;
 
 architecture Behavioral of ControlUnit is
 type T_STATE is
-      (FETCH, DECODE, MEM_ADR, MEM_READ, MEM_WRITEBACK, MEM_WRITE, EXECUTE, ALU_WRITEBACK, BRANCH, ADDI_EXECUTE, ADDI_WRITEBACK);
+      (FETCH, DECODE, CHECK_OP, MEM_ADR, MEM_READ, MEM_WRITEBACK, MEM_WRITE, EXECUTE, ALU_WRITEBACK, BRANCH, ADDI_EXECUTE, ADDI_WRITEBACK);
 signal state : T_STATE := FETCH; 
     
 procedure report_state(newState : in T_STATE) is
@@ -35,119 +35,125 @@ begin
     -- That is because as of now they only get asserted in FETCH and in states leading to FETCH, but if this changes, 
     -- there will be a need for more resets
     process(clk) begin
-        case state is
-
-            when FETCH =>
-                -- Enables
-                MemWrite <= '0';
-                IRWrite <= '1';
-                PCWrite <= '1';
-                oBranch <= '0';
-                RegWrite <= '0';
+        if falling_edge(clk) then
+            case state is
+    
+                when FETCH =>
+                    -- Enables
+                    MemWrite <= '0';
+                    IRWrite <= '1';
+                    PCWrite <= '1';
+                    oBranch <= '0';
+                    RegWrite <= '0';
+                
+                    IorD <= '0';
+                    SrcAChoose <= '0';
+                    SrcBChoose <= "01";
+                    ALUOp <= "00";
+                    PCSrc <= '0';
+                   
+                    
+                    report_state(DECODE);
+                    state <= DECODE;
+    
+                when DECODE =>
+                    -- Enables
+                    MemWrite <= '0';
+                    IRWrite <= '0';
+                    PCWrite <= '0';
+                    oBranch <= '0';
+                    RegWrite <= '0';
+                    
+                    report_state(CHECK_OP);
+                    state <= CHECK_OP;
             
-                IorD <= '0';
-                SrcAChoose <= '0';
-                SrcBChoose <= "01";
-                ALUOp <= "00";
-                PCSrc <= '0';
-               
+                when CHECK_OP =>
+                    case Op is
+                        when "000000" =>
+                            report_state(EXECUTE);
+                            state <= EXECUTE; -- Execute R instruction
+                        when "100011" | "101011" =>
+                            report_state(MEM_ADR);
+                            state <= MEM_ADR; -- lw or sw
+                        when "001000" =>
+                            report_state(ADDI_EXECUTE);
+                            state <= ADDI_EXECUTE;    
+                        when others =>
+                            report "DECODE failed to change state.";
+                    end case;
+    
+                when MEM_ADR =>
+                    SrcAChoose <= '1';
+                    SrcBChoose <= "10";
+                    ALUOp <= "00";
+                    
+                    if Op="100011" then
+                        -- lw
+                        report_state(MEM_READ);
+                        state <= MEM_READ; 
+                    else
+                        -- sw
+                        report_state(MEM_WRITE);
+                        state <= MEM_WRITE;
+                    end if;
+    
+                when MEM_READ =>
+                    IorD <= '1';
+                    
+                    report_state(MEM_WRITEBACK);
+                    state <= MEM_WRITEBACK;
+    
+                when MEM_WRITEBACK =>
+                    RegDst <= '0';
+                    MemtoReg <= '1';
+                    RegWrite <= '1';
+                    
+                    report_state(FETCH);
+                    state <= FETCH;
+    
+                when MEM_WRITE =>
+                    IorD <= '1';
+                    MemWrite <= '1';
+                    
+                    report_state(FETCH);
+                    state <= FETCH;
+    
+                when EXECUTE =>
+                    SrcAChoose <= '1';
+                    SrcBChoose <= "00";
+                    ALUOp <= "10";
+                    
+                    report_state(ALU_WRITEBACK);
+                    state <= ALU_WRITEBACK;
+    
+                when ALU_WRITEBACK =>
+                    RegDst <= '1';
+                    MemtoReg <= '0';
+                    RegWrite <= '1';
+                    
+                    report_state(FETCH);
+                    state <= FETCH;
+                    
+                when ADDI_EXECUTE =>
+                    SrcBChoose <= "10";
+                    SrcAChoose <= '1';
+                    ALUOp <= "00";
+                    
+                    report_state(ADDI_WRITEBACK);
+                    state <= ADDI_WRITEBACK;
+                    
+                when ADDI_WRITEBACK =>
+                    MemtoReg <= '0';
+                    RegWrite <= '1';
+                    RegDst <= '0';
+                    
+                    report_state(FETCH);
+                    state <= FETCH;
                 
-                report_state(DECODE);
-                state <= DECODE;
-
-            when DECODE =>
-                -- Enables
-                MemWrite <= '0';
-                IRWrite <= '0';
-                PCWrite <= '0';
-                oBranch <= '0';
-                RegWrite <= '0';
-            
-                case Op is
-                    when "000000" =>
-                        report_state(EXECUTE);
-                        state <= EXECUTE; -- Execute R instruction
-                    when "100011" | "101011" =>
-                        report_state(MEM_ADR);
-                        state <= MEM_ADR; -- lw or sw
-                    when "001000" =>
-                        report_state(ADDI_EXECUTE);
-                        state <= ADDI_EXECUTE;    
-                    when others =>
-                        report "DECODE failed to change state.";
-                end case;
-
-            when MEM_ADR =>
-                SrcAChoose <= '1';
-                SrcBChoose <= "10";
-                ALUOp <= "00";
-                
-                if Op="100011" then
-                    -- lw
-                    report_state(MEM_READ);
-                    state <= MEM_READ; 
-                else
-                    -- sw
-                    report_state(MEM_WRITE);
-                    state <= MEM_WRITE;
-                end if;
-
-            when MEM_READ =>
-                IorD <= '1';
-                
-                report_state(MEM_WRITEBACK);
-                state <= MEM_WRITEBACK;
-
-            when MEM_WRITEBACK =>
-                RegDst <= '0';
-                MemtoReg <= '1';
-                RegWrite <= '1';
-                
-                report_state(FETCH);
-                state <= FETCH;
-
-            when MEM_WRITE =>
-                IorD <= '1';
-                MemWrite <= '1';
-                
-                report_state(FETCH);
-                state <= FETCH;
-
-            when EXECUTE =>
-                SrcAChoose <= '1';
-                SrcBChoose <= "00";
-                ALUOp <= "10";
-                
-                report_state(ALU_WRITEBACK);
-                state <= ALU_WRITEBACK;
-
-            when ALU_WRITEBACK =>
-                RegDst <= '1';
-                MemtoReg <= '0';
-                RegWrite <= '1';
-                
-                report_state(FETCH);
-                state <= FETCH;
-                
-            when ADDI_EXECUTE =>
-                SrcBChoose <= "10";
-                SrcAChoose <= '1';
-                ALUOp <= "00";
-                
-                report_state(ADDI_WRITEBACK);
-                state <= ADDI_WRITEBACK;
-                
-            when ADDI_WRITEBACK =>
-                MemtoReg <= '0';
-                RegWrite <= '1';
-                RegDst <= '0';
-                
-                report_state(FETCH);
-                state <= FETCH;
-            
-            when others =>
-                report "Unknown state";
-        end case;
+                when others =>
+                    report "Unknown state";
+            end case;
+        end if;
     end process;
 
 end Behavioral;

@@ -1,0 +1,30 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+
+entity FallingFlipFlop is
+    Port ( clk, reset : in STD_LOGIC;
+           enabled : in STD_LOGIC;
+           input : in STD_LOGIC_VECTOR (31 downto 0);
+           output : out STD_LOGIC_VECTOR (31 downto 0));
+end FallingFlipFlop;
+
+architecture Behavioral of FallingFlipFlop is
+signal value: STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
+begin
+    process(clk, reset) begin
+        if reset='1' then
+            value <= (others => '0');
+        end if;
+        
+        if falling_edge(clk) then
+            if enabled='1' then
+                value <= input;
+            end if;
+        end if;
+        
+        output <= value;
+        
+    end process;
+
+end Behavioral;

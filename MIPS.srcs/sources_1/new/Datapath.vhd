@@ -54,6 +54,13 @@ architecture Behavioral of Datapath is
            WriteData : in STD_LOGIC_VECTOR (31 downto 0);
            ReadData : out STD_LOGIC_VECTOR (31 downto 0));
     end component;
+    component FallingFlipFlop is
+    Port ( clk, reset : in STD_LOGIC;
+           enabled : in STD_LOGIC;
+           input : in STD_LOGIC_VECTOR (31 downto 0);
+           output : out STD_LOGIC_VECTOR (31 downto 0));
+    end component;
+    
     
     component Mux2 is
     Generic (
@@ -116,7 +123,7 @@ begin
     InstructionAndDataMem: Memory port map(clk => clk, reset => reset, Addr => MemAddr, MemWrite => MemWrite, 
                                                   WriteData => RegReadData2, ReadData => MemReadData);
     
-    InstrFlipFlop: EnabledFlipFlop port map(clk => clk, reset => reset, enabled => IRWrite, input => MemReadData, output => Instr);
+    InstrFlipFlop: FallingFlipFlop port map(clk => clk, reset => reset, enabled => IRWrite, input => MemReadData, output => Instr);
     WriteAdrMux: Mux2 generic map(width=>5) 
                  port map(Choose => RegDst, IfTrue => Instr(15 downto 11), IfFalse => Instr(20 downto 16), y => RegWriteAdr);
     WriteDataMux: Mux2 port map(Choose => MemtoReg, IfTrue => Data, IfFalse => ALUOut, y => RegWriteData);
@@ -134,9 +141,12 @@ begin
     process(clk) begin
         if rising_edge(clk) then
             ALUOut <= ALUResult;
-            Data <= MemReadData;
             RegReadData1 <= RegOut1;
             RegReadData2 <= RegOut2;
+        end if;
+        
+        if falling_edge(clk) then
+            Data <= MemReadData;
         end if;
     end process;
     

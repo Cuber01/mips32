@@ -61,15 +61,18 @@ begin
                 when DECODE =>
                     -- Enables
                     MemWrite <= '0';
-                    IRWrite <= '0';
                     PCWrite <= '0';
                     oBranch <= '0';
                     RegWrite <= '0';
+                    IRWrite <= '0';
+                    
                     
                     report_state(CHECK_OP);
                     state <= CHECK_OP;
             
                 when CHECK_OP =>
+
+                
                     case Op is
                         when "000000" =>
                             report_state(EXECUTE);

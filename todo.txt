@@ -1,2 +1,2 @@
 - My PC is incremented by one instead of by 4, even though my instructions take 4 bytes of memory. Is this correct?
-- Control Unit on falling edge may cause issues
+- Your current program is likely to write onto instruction memory, rewrite that value man

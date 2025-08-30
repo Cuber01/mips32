@@ -1,6 +1,6 @@
 addi $s0, $0, 5 # 0101
 sw $s0, 1($s0) # saving 5 at memory adr 6
-#lw $s2, 0($s1)
+lw $s1, 1($s0) # loading 5 into $s1 from memory adr 6
 # this is wrong below
 #add $s0, $s2, $s1 # 1010
 #or $s1, $s2, $s0 # 1111
